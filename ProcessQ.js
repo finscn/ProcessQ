@@ -95,7 +95,6 @@
 				this.onPausing(deltaTime);
 				return;
 			}
-			console.log(deltaTime)
 			this.update(deltaTime);
 
 			if (!this.currentItem){
