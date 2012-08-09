@@ -90,11 +90,12 @@
 		run : function(){
 			this.mainLoop=setTimeout( this.callRun, this.interval );
 			this.timerTick();
-			var deltaTime=this.timer.deltaTime;
+			var deltaTime=this.timer.delta;
 			if (this.paused && this.onPausing!=null ){
 				this.onPausing(deltaTime);
 				return;
 			}
+			console.log(deltaTime)
 			this.update(deltaTime);
 
 			if (!this.currentItem){
