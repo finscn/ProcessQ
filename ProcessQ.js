@@ -259,7 +259,7 @@
 		var test = new Audio();
 		for( var ext in AudioLoader.formats ) {
 			if ( test.canPlayType(AudioLoader.formats[ext]) ) {
-				AudioLoader.audioFormat = ext;
+				AudioLoader.supportFormat = ext;
 				break;
 			}
 		}
@@ -285,7 +285,7 @@
 			audio.addEventListener("error", onerror);
 
 			//TODO : check has ext-filename
-			audio.src = this.src+"."+AudioLoader.audioFormat;
+			audio.src = this.src+"."+AudioLoader.supportFormat;
 			audio.preload = true;
 			audio.autobuffer = true;
 		},
