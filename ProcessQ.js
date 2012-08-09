@@ -17,7 +17,7 @@
 	ProcessQ.prototype={
 		constructor : ProcessQ,
 
-		interval : 100,
+		interval : 10,
 
 		ignorError : true ,
 		defaultDelay : 0 ,
