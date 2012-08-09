@@ -17,7 +17,7 @@
 	ProcessQ.prototype={
 		constructor : ProcessQ,
 
-		interval : 10,
+		interval : 20,
 
 		ignorError : true ,
 		defaultDelay : 0 ,
@@ -202,17 +202,19 @@
 	ProcessQ.types["img"]=ImageLoader;
 
 	ImageLoader.prototype={
+		async : true ,
 		constructor : ImageLoader,
 		id : null ,
 		start : function(queue){
 			var img=this.img=new Image();
-			this.finished=false;
+			this.finished=this.async;
 			var Me=this;
 			function onload(event) {
 				Me.finished=true;
 				this.removeEventListener("load", onload);
 			}
 			function onerror(event) {
+				Me.finished=false;
 				Me.errorEvent=event;
 				this.removeEventListener("error", onerror);
 			}
@@ -268,15 +270,17 @@
 	AudioLoader.prototype={
 		constructor : AudioLoader,
 		id : null ,
+		async : true ,
 		start : function(queue){
 			var audio=this.audio=new Audio();
-			this.finished=false;
+			this.finished=this.async;
 			var Me=this;
 			function onload(event) {
 				Me.finished=true;
 				this.removeEventListener("canplaythrough", onload);
 			}
 			function onerror(event) {
+				Me.finished=false;
 				Me.errorEvent=event;
 				this.removeEventListener("error", onerror);
 			}
