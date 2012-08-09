@@ -22,7 +22,8 @@ ProcessQ 是一个用于WebApp (如HTML5 game)的"预处理动作队列".
 
 ### 和 PreLoadJS 有何不同?
 PreloadJS (https://github.com/CreateJS/PreloadJS/ ) 是非常优秀和知名的加载工具类库.
-从功能上来说 ProcessQ和PreloadJS完全等同, 即,PreloadJS能做的事情, ProcessQ也都能做(但可能需要做一些扩展),反之亦然.
+从功能上来说 ProcessQ和PreloadJS完全等同, 即,PreloadJS能做的事情, ProcessQ也都能做(但可能需要做一些扩展),反之亦然. 其实这是废话啊, 因为两者都可以随意扩充, 外加动态脚本语言,不可能存在A能实现,B实现不了的...囧...
+
 
 PreloadJS 默认情况下 功能比 ProcessQ 更丰富 , 但是很多功能其实并不常用. 而且我个人并不是很喜欢PreLoadJS的抽象方式, 它更倾向于"加载资源"这个概念.
 
