@@ -134,7 +134,7 @@
 			if (deltaTime<1){
 				return;
 			}
-			if (this.currentItem._delay>0){
+			if (this.currentItem._delay>=this.interval){
 				this.currentItem._delay-=deltaTime;
 			}else if(!this.currentItem._started){
 				this.currentItem.start(this);
