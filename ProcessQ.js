@@ -126,6 +126,9 @@
 				if (this.currentItem._delay==0){
 					this.currentItem.start(this);
 					this.currentItem._started=true;
+					if (this.currentItem.async){
+						this.next();
+					}
 				}
 			}
 		},
@@ -139,16 +142,17 @@
 			}else if(!this.currentItem._started){
 				this.currentItem.start(this);
 				this.currentItem._started=true;
+				if (this.currentItem.async){
+					this.next();
+				}
 			}
 
-			if ( this.currentItem._started ){
+			if ( this.currentItem &&this.currentItem._started ){
 				
 				if (this.currentItem.isFinished(this) ) {
 					this.onItemFinish(this.currentItem);
 
-					this.finishedWeight+=this.currentItem.weight;
 					this.next(deltaTime);
-
 
 				}else if ( this.currentItem.isError 
 						&& this.currentItem.isError(this) ) {
@@ -156,7 +160,8 @@
 					this.onItemError(this.currentItem,this);
 
 					if (this.ignorError){
-						this.finishedWeight+=this.currentItem.weight;
+						// this.finishedWeight+=this.currentItem.weight;
+						this.onItemFinish(this.currentItem);
 						this.next(deltaTime);
 					}
 				}
@@ -178,6 +183,7 @@
 				var rs=item.getResult();
 				this.resultPool[item.id]=rs;
 			}
+			this.finishedWeight+=item.weight;
 			this.finishedCount++;
 		},
 		onItemError : function(item,queue){
@@ -207,7 +213,7 @@
 		id : null ,
 		start : function(queue){
 			var img=this.img=new Image();
-			this.finished=this.async;
+			this.finished=false;
 			var Me=this;
 			function onload(event) {
 				Me.finished=true;
@@ -273,7 +279,7 @@
 		async : false ,
 		start : function(queue){
 			var audio=this.audio=new Audio();
-			this.finished=this.async;
+			this.finished=false;
 			var Me=this;
 			function onload(event) {
 				Me.finished=true;
