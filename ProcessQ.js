@@ -202,7 +202,7 @@
 	ProcessQ.types["img"]=ImageLoader;
 
 	ImageLoader.prototype={
-		async : true ,
+		async : false ,
 		constructor : ImageLoader,
 		id : null ,
 		start : function(queue){
@@ -270,7 +270,7 @@
 	AudioLoader.prototype={
 		constructor : AudioLoader,
 		id : null ,
-		async : true ,
+		async : false ,
 		start : function(queue){
 			var audio=this.audio=new Audio();
 			this.finished=this.async;
