@@ -1,0 +1,78 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Cache-Control" content="no-cache" />
+
+
+<title>ProcessQ Test</title>
+
+
+<script src="../ProcessQ.js"></script>
+
+
+<script>
+
+var queue=new ProcessQ({
+
+	defaultDelay : 20 , // run every process delay "defaultDelay" ms
+	items : [
+		{ type : "img" , id : "ha-1", src:"./res/ha-1.png"},
+		{ type : "img" , id : "ha-2", src:"./res/ha-2.png"},
+		{ type : "img" , id : "hb-1", src:"./res/hb-1.png"},
+		{ type : "img" , id : "hb-2", src:"./res/hb-2.png"},
+
+		{ type : "audio" , 
+			weight : 2 , 
+			id : "bgm-1", src:"./res/bgm-1" }, //whitout ext-filename
+	],
+
+	onProgressing : function(deltaTime,queue){
+		processingBar.style.width=queue.finishedWeight/queue.totalWeight*100+"%"
+	},
+	onFinish : function(queue){
+		processingBar.style.width="100%";
+		alert("finished : " +queue.finishedWeight+","+queue.finishedCount );
+	}
+})
+
+var processingBar;
+window.onload=function(){
+
+	processingBar=document.getElementById("bar");
+	queue.init();
+	queue.start();
+	
+}
+	
+</script>
+<style type="text/css">
+#bar-box {
+	position: relative;
+	width : 200px;
+	height : 30px;
+	border: 2px solid black;
+}
+#bar {
+	position: absolute;
+	background-color: red;
+	height : 30px;
+	width : 0%;
+}
+</style>
+</head>
+
+<body >
+
+<div id="bar-box">
+<div id="bar"></div>
+</div>
+
+</body>
+
+</html>
+
+

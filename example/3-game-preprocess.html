@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta http-equiv="Pragma" content="no-cache" />
+<meta http-equiv="Expires" content="-1" />
+<meta http-equiv="Cache-Control" content="no-cache" />
+
+
+<title>ProcessQ Test</title>
+
+
+<script src="../ProcessQ.js"></script>
+
+
+<script>
+
+var loader=new ProcessQ({
+	defaultDelay : 100 ,
+	items : [
+
+		{
+			id : "fn_1", 
+			start:function(){ 
+					console.log("do something ,not loading resource.") 
+				}
+		},
+		
+		{	id : "fn_2", 
+			start:function(){ 
+					console.log("do something ,is async.");
+					var Me=this;
+					setTimeout(function(){
+						console.log("done!");
+						Me.done=true;
+					})
+				}, 
+			isFinished : function(){
+					return this.done;
+				} 
+		},
+		// load resource 
+		{id: "sprite",	type: "img", src: "../../res/sprite123.png" }, 
+		{id: "tileset", type: "img", src: "../../res/tileset.png"}, 
+		{id: "bg", type: "img", src: "../../res/bg.png" },
+
+		{id: "bgm1", type: "audio", src: "../../res/bgm1"	},
+		{id: "bgm2", type: "audio", src: "../../res/bgm2"	}
+	],
+	onItemError : function(item,queue){
+		console.log( "run item '"+item.id+"' err. ignor: "+queue.ignorError);
+	},
+	onProgressing : function(deltaTime,queue){
+		console.log( queue.finishedWeight,"/",queue.totalWeight)
+	},
+	onFinish : function(queue){
+		console.log("loaded : " ,queue.finishedWeight,"/",queue.totalWeight );;
+		console.log(queue.resultPool);
+	}
+})
+loader.init();
+loader.start();
+	
+</script>
+<style type="text/css">
+
+</style>
+</head>
+
+<body >
+
+
+
+</body>
+
+</html>
+
+
