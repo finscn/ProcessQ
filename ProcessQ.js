@@ -292,6 +292,7 @@
 			audio.src = this.src+"."+AudioLoader.supportFormat;
 			audio.preload = true;
 			audio.autobuffer = true;
+			audio.load();
 		},
 
 		getResult : function(){
