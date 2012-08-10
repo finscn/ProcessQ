@@ -15,6 +15,7 @@
 	ProcessQ.types={};
 
 	ProcessQ.prototype={
+		
 		constructor : ProcessQ,
 
 		interval : 20,
