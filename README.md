@@ -1,7 +1,7 @@
 ProcessQ
 =========
 
-A (pre)process-queue ( e.g resource-loader ) implement  for Web App. 
+A (pre)process-queue ( e.g resource-loader ) implementation  for Web App. 
 
 ProcessQ 是一个用于WebApp (如HTML5 game)的"预处理动作队列".
 
