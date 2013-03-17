@@ -2,15 +2,20 @@ ProcessQ
 =========
 
 ###简单介绍
+
   A (pre)process-queue ( e.g resource-loader ) implementation  for Web App. 
+
   ProcessQ 是一个用于WebApp (如HTML5 game)的"预处理动作队列".
 
 ###更新日志
-2013/03/18 添加js loader 加载脚本资源
-2013/03/18 准备添加英语文档
+
+  2013/03/18 添加js loader 加载脚本资源
+
+  2013/03/18 准备添加英语文档
 
 
 ###何为"预处理动作队列"?
+
   在WebApp启动前,通常我们会有一些预处理工作要执行. 下面拿游戏举例说明:
 
   为了保证游戏后续运行和显示可以正常且流程的进行, 在游戏启动前, 我们会预先加载游戏中的图片,音乐等资源.
@@ -26,7 +31,9 @@ ProcessQ
   所以,从这个角度出发, 我封装了这样一个实现, 它不在乎具体的预处理操作是什么,只要每一个操作提供了必须的方法(start, isFinished), 那么就可以很好的这些操作管理起来.
 
 ### 和 PreLoadJS 有何不同?
+
   PreloadJS (https://github.com/CreateJS/PreloadJS/ ) 是非常优秀和知名的加载工具类库.
+
   从功能上来说 ProcessQ和PreloadJS完全等同, 即,PreloadJS能做的事情, ProcessQ也都能做(但可能需要做一些扩展),反之亦然. 其实这是废话啊, 因为两者都可以随意扩充, 外加动态脚本语言,不可能存在A能实现,B实现不了的...囧...
 
 
@@ -59,8 +66,9 @@ ProcessQ
 ### 更多功能和用法详见 example 下的示例 和源码.
 
   关于 weight , delay 等属性的设置和作用详见示例中的注释 和 源码.
+
   我英文很搓, 大家领会精神吧. 
 
 ###ProcessQ Documents(en) by CashLee
 
-Introdution
+  Introdution
