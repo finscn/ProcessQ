@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<!-- This is a template for Web App Setup -->
+<!-- Author : @CashLee李秉骏 -->
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimum-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<!-- Deal with the proxy cache and some browser cache here is the setting of the meta -->
+<meta http-equiv="cache-control" content="no-cache">
+<!-- This method is for the old browsers -->
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="expires" content="0">
+<!-- Web App icon -->
+<link rel="apple-touch-icon" href="iphon_tetris_icon.png"/>
+<!-- Web App Status Bar Style 状态栏样式 -->
+<meta name="apple-mobile-web-app-status-bar-style" content="black" />
+<!-- Web App Start Up Page For Each Device -->
+<meta name='description' content='' >
+<meta name='author' content='' >
+<title>hello world</title>
+<link rel='stylesheet' type='text/css' href='./css/app.css' />
+<!-- Load ProcessQ Javascript Lib -->
+<script src='../ProcessQ.js'></script>
+<script>
+
+var mask = document.createElement('div');
+mask.setAttribute('id','mask');
+
+var queue = new ProcessQ({
+
+	defaultDelay : 20 , // run every process delay "defaultDelay" ms
+	items : [
+		{ type : "img" , id : "ha-1", src:"./res/ha-1.png"},
+		{ type : "img" , id : "ha-2", src:"./res/ha-2.png"},
+		{ type : "img" , id : "hb-1", src:"./res/hb-1.png"},
+		{ type : "img" , id : "hb-2", src:"./res/hb-2.png"},
+		{ type : "audio" , weight : 1 , id : "bgm-1", src:"./res/bgm-1" }, //whitout ext-filename
+		{ type : "script" , weight : 1 , id : "zepto", src:"./res/zepto.js" }, //whitout ext-filename
+	],
+
+	onProgressing : function( deltaTime , queue ){
+    console.log("时间差:" +  deltaTime );
+    //console.log( queue );
+    document.getElementById('mask').innerHTML = '<a id="mask-text">已经加载：'+ queue.finishedWeight/queue.totalWeight*100+'%</a>';
+		console.log( queue.finishedWeight/queue.totalWeight*100+"%" );
+	},
+
+	onFinish : function(queue){
+    document.getElementById('mask').innerHTML = '<a id="mask-text">已经加载：'+queue.finishedWeight/queue.totalWeight*100+'%</a>';
+		//console.log("finished : " +queue.finishedWeight+","+queue.finishedCount );
+	}
+
+})
+
+var processingBar;
+window.onload=function(){
+  document.getElementById('home').appendChild( mask );
+	queue.init();
+	queue.start();
+}
+
+</script>
+</head>
+<body id='home'>
+  <script id='hello'></script>
+</body>
+</html>
