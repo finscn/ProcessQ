@@ -1,5 +1,3 @@
-
-
 ;(function(scope,undefined){
 	
 	var ProcessQ=scope.ProcessQ=function(cfg){
@@ -12,6 +10,7 @@
 		};
 		this.timer={};
 	};
+
 	ProcessQ.types={};
 
 	ProcessQ.prototype={
@@ -200,6 +199,7 @@
 			this[key]=cfg[key]
 		}	
 	}
+
 	ProcessQ.types["img"]=ImageLoader;
 
 	ImageLoader.prototype={
@@ -207,7 +207,7 @@
 		constructor : ImageLoader,
 		id : null ,
 		start : function(queue){
-			var img=this.img=new Image();
+			var img= this.img =new Image();
 			this.finished=this.async;
 			var Me=this;
 			function onload(event) {
@@ -309,8 +309,63 @@
 
 	};
 
+  /* add javascript source loader */
+
+	var JsLoader =function(cfg){
+		for (var key in cfg){
+			this[key]=cfg[key]
+		}
+	};
+
+	ProcessQ.types["script"]=JsLoader;
+
+  JsLoader.prototype = {
+		constructor : JsLoader,
+		id : null ,
+		async : false ,
+		start : function(queue){
+      var script = this.script = new Image();
+			this.finished=this.async;
+			var Me=this;
+
+      //throw SyntaxError();
+
+			function onload(event) {
+				Me.finished=true;
+				this.removeEventListener("load", onload);
+			}
+			function onerror(event) {
+				Me.finished=false;
+				Me.errorEvent=event;
+				this.removeEventListener("error", onerror);
+			}
+
+			script.addEventListener("load", onload);
+			script.addEventListener("error", onerror);
+			script.setAttribute('src', this.src );
+
+      setTimeout( function (){
+        var oHead = document.getElementsByTagName('HEAD').item(0);
+        var oScript= document.createElement("script");
+        oScript.type = "text/javascript";
+        oScript.src = script.src ;
+        oHead.appendChild( oScript);
+      }, 10 );
+
+		},
+
+		getResult : function(){
+			return this.script;
+		},
+
+		isFinished : function(queue){
+			return this.finished;
+		},
+
+		isError : function(queue){
+			return this.errorEvent;
+		}
+  }
+
 
 }(this));
-
-
-

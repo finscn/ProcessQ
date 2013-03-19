@@ -1,0 +1,23 @@
+/* Public Style */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#mask {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgb( 199, 133 , 80);
+  color: #fafafa;
+  font-size: 2em;
+}
+#mask-text {
+  position: relative;
+  top: 50%;
+  left: 50%;
+  margin-left: -120px;
+  margin-top: -16px;
+}
