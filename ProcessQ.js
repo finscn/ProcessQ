@@ -1,5 +1,3 @@
-
-
 ;(function(scope,undefined){
 	
 	var ProcessQ=scope.ProcessQ=function(cfg){
@@ -12,6 +10,7 @@
 		};
 		this.timer={};
 	};
+
 	ProcessQ.types={};
 
 	ProcessQ.prototype={
@@ -200,6 +199,7 @@
 			this[key]=cfg[key]
 		}	
 	}
+
 	ProcessQ.types["img"]=ImageLoader;
 
 	ImageLoader.prototype={
@@ -208,7 +208,6 @@
 		id : null ,
 		start : function(queue){
 			var img= this.img =new Image();
-      console.log( this.img );
 			this.finished=this.async;
 			var Me=this;
 			function onload(event) {
@@ -325,7 +324,6 @@
 		id : null ,
 		async : false ,
 		start : function(queue){
-      console.log( this );
       var script = this.script = new Image();
 			this.finished=this.async;
 			var Me=this;
@@ -344,15 +342,15 @@
 
 			script.addEventListener("load", onload);
 			script.addEventListener("error", onerror);
-
 			script.setAttribute('src', this.src );
-      document.getElementById('hello').setAttribute('src', this.src );
 
-      var oHead = document.getElementsByTagName('HEAD').item(0);
-      var oScript= document.createElement("script");
-      oScript.type = "text/javascript";
-      oScript.src= this.src ;
-      oHead.appendChild( oScript);
+      setTimeout( function (){
+        var oHead = document.getElementsByTagName('HEAD').item(0);
+        var oScript= document.createElement("script");
+        oScript.type = "text/javascript";
+        oScript.src = script.src ;
+        oHead.appendChild( oScript);
+      }, 10 );
 
 		},
 
