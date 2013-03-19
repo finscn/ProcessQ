@@ -9,6 +9,8 @@ ProcessQ
 
 ###更新日志
 
+  2013/03/19 添加min版本的ProcessQ；修复重复请求的bug
+
   2013/03/18 添加js loader 加载脚本资源
 
   2013/03/18 准备添加英语文档
@@ -22,7 +24,6 @@ ProcessQ
   为了处理这类资源加载工作, 通常我们会写一个Loader工具类(或函数) 来帮忙简化这些操作. 同时加入 onLoading onLoaded一类的hook方法来实现对加载过程的监听.
 
   对于大多数开发人员来说,这没什么难度,使用new Image() new Audio(),再配合onload一类的dom事件便可以轻松的实现.
-   
 
   然后, 在实际应用中, 除了加载资源文件之外,我们可能还会有一些更复杂的预处理工作要进行,如: 提前算游戏中需要的一些数据(避免运行时计算带来的性能损耗), 从本地或远程加载游戏的配置信息, 检测用户运行环境等等.
 
@@ -52,14 +53,19 @@ ProcessQ
 			{ type : "img" , id : "ha-1", src:"./res/ha-1.png"},
 			{ type : "audio" , id : "bgm-1", src:"./res/bgm-1"},
 		],
+
 		onProgressing : function(deltaTime,queue){
 			console.log( "progressing" , queue.finishedWeight," of ",queue.totalWeight);
 		},
+
 		onFinish : function(queue){
 			console.log("finished : " , queue.finishedCount );
 		}
+
 	});
+
 	queue.init();
+
 	queue.start();
 
 
