@@ -25,7 +25,7 @@
         defalutType: "img",
 
         paiallel: false,
-        wrapAudio : false,
+        wrapAudio: false,
         rootPath: null,
         defaultItemIsFinished: function() {
             return true;
@@ -88,10 +88,10 @@
                 if (this.rootPath[this.rootPath.length - 1] != "/") {
                     this.rootPath += "/";
                 }
-            }else{
-                this.rootPath="";
+            } else {
+                this.rootPath = "";
             }
-            if (item.src){
+            if (item.src) {
                 if (item.src[0] == "/") {
                     item.src = item.src.substring(1);
                 }
@@ -277,11 +277,11 @@
         constructor: FunctionLoader,
         id: null,
         async: false,
-        errorEvent : null,
+        errorEvent: null,
         start: function(queue) {
             // this.finished = this.async;
-            this.finished=true;
-            this.result=this.fn();
+            this.finished = true;
+            this.result = this.fn();
         },
 
         getResult: function() {
@@ -313,7 +313,7 @@
         constructor: ImageLoader,
         id: null,
         async: false,
-        errorEvent : null,
+        errorEvent: null,
 
         start: function(queue) {
             var img = this.img = new Image();
@@ -384,7 +384,7 @@
         constructor: AudioLoader,
         id: null,
         async: false,
-        errorEvent : null,
+        errorEvent: null,
         wrap: false,
         start: function(queue) {
             this.wrap = queue.wrapAudio;
