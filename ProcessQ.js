@@ -385,9 +385,9 @@
         id: null,
         async: false,
         errorEvent: null,
-        wrap: false,
+        wrap: null,
         start: function(queue) {
-            this.wrap = queue.wrapAudio;
+            this.wrap = this.wrap===null?queue.wrapAudio:this.wrap;
             var audio = this.audio = new Audio();
             this.finished = this.async;
             audio.loader = this;
