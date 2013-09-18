@@ -18,90 +18,96 @@
 
 var queue=new ProcessQ({
 
-	defaultDelay : 20 , // run every process delay "defaultDelay" ms ,default : 0 ,
-	items : [
+    defaultDelay : 20 , // run every process delay "defaultDelay" ms ,default : 0 ,
+    items : [
 
-		{
-			id : "fn_1",  // default : "id_"+(index+1) in items
-			weight : 5 ,  //  default : 1
-			start:function(){ 
-					console.log("run "+this.id+" , do something , is sync ") ;
-					var i=2000;
-					while(i--){
-						// do-something
-					}
-					console.log(this.id + "is done!");
-				}
-		},
-		{
-			id : "fn_2", 
-			start:function(){ console.log("run "+this.id+" , do something")	}
-		},	
-		{
-			id : "fn_3", 
-			start:function(){ console.log("run "+this.id+" , do something")	}
-		},	
-		{
-			id : "fn_4", 
-			start:function(){ console.log("run "+this.id+" , do something")	}
-		},	
-		{
-			id : "fn_5", 
-			start:function(){ console.log("run "+this.id+" , do something")	}
-		},	
-		{	
-			id : "fn_6", 
-			weight : 10 ,
-			delay : 6 , //run this process delay 6ms, default:queue.defaultDelay 
+        {
+            id : "fn_1",  // default : "id_"+(index+1) in items
+            weight : 5 ,  //  default : 1
+            type : "fn",
+            fn:function(){ 
+                    console.log("run "+this.id+" , do something , is sync ") ;
+                    var i=2000;
+                    while(i--){
+                        // do-something
+                    }
+                    console.log(this.id + "is done!");
+                }
+        },
+        {
+            id : "fn_2", 
+            type : "fn",
+            fn:function(){ console.log("run "+this.id+" , do something")    }
+        },  
+        {
+            id : "fn_3", 
+            type : "fn",
+            fn:function(){ console.log("run "+this.id+" , do something")    }
+        },  
+        {
+            id : "fn_4", 
+            type : "fn",
+            fn:function(){ console.log("run "+this.id+" , do something")    }
+        },  
+        {
+            id : "fn_5", 
+            type : "fn",
+            fn:function(){ console.log("run "+this.id+" , do something")    }
+        },  
+        {   
+            id : "fn_6", 
+            weight : 10 ,
+            delay : 6 , //run this process delay 6ms, default:queue.defaultDelay 
 
-			start:function(){ 
-					console.log("run "+this.id+" , do something ,is async.");
+            type : "fn",
+            fn:function(){ 
+                    console.log("run "+this.id+" , do something ,is async.");
 
-					//  simulate async process
-					var Me=this;
-					setTimeout(function(){
-						console.log(Me.id + "is done!");
-						Me.done=true;
-					},1000)
-				}, 
-			isFinished : function(){
-					return this.done;
-				} 
-		}
-	],
+                    //  simulate async process
+                    var Me=this;
+                    setTimeout(function(){
+                        console.log(Me.id + "is done!");
+                        Me.done=true;
+                    },1000)
+                }, 
+            isFinished : function(){
+                    return this.done;
+                } 
+        }
+    ],
 
-	onProgressing : function(deltaTime,queue){
-		console.log( "progressing" , queue.finishedWeight," of ",queue.totalWeight);
-		processingBar.style.width=queue.finishedWeight/queue.totalWeight*100+"%"
-	},
-	onFinish : function(queue){
-		processingBar.style.width="100%";
-		alert("finished : " +queue.finishedWeight+","+queue.finishedCount );
-	}
+    onProgressing : function(deltaTime,queue){
+        console.log( "progressing" , queue.finishedWeight," of ",queue.totalWeight);
+        processingBar.style.width=queue.finishedWeight/queue.totalWeight*100+"%"
+    },
+    onFinish : function(queue){
+        processingBar.style.width="100%";
+        alert("finished : " +queue.finishedWeight+","+queue.finishedCount );
+    }
 })
 
 var processingBar;
 window.onload=function(){
 
-	processingBar=document.getElementById("bar");
-	queue.init();
-	queue.start();
-	
+    processingBar=document.getElementById("bar");
+    queue.init();
+    queue.start();
+    
 }
-	
+    
 </script>
 <style type="text/css">
 #bar-box {
-	position: relative;
-	width : 200px;
-	height : 30px;
-	border: 2px solid black;
+    position: relative;
+    width : 200px;
+    height : 30px;
+    border: 2px solid black;
 }
 #bar {
-	position: absolute;
-	background-color: red;
-	height : 30px;
-	width : 0%;
+    position: absolute;
+    background-color: red;
+    height : 30px;
+    width : 0%;
 }
 </style>
 </head>

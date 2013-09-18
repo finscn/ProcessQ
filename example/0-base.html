@@ -18,37 +18,39 @@
 
 var queue=new ProcessQ({
 
-	// run every process delay "defaultDelay" ms ,default : 0 ,
-	defaultDelay : 20 , 
-	items : [
+    // run every process delay "defaultDelay" ms ,default : 0 ,
+    defaultDelay : 20 , 
+    items : [
 
-		{
-			// default : "id_"+(index+1) in items
-			id : "fn_1",  
+        {
+            // default : "id_"+(index+1) in items
+            id : "fn_1",  
+            type : "fn",
+            // the process's percent of Total is weight/totalWeight ,
+            // default weight : 1
+            weight : 3 ,  
+            fn:function(){ console.log("run "+this.id+" process.") }
 
-			// the process's percent of Total is weight/totalWeight ,
-			// default weight : 1
-			weight : 3 ,  
-			start:function(){ console.log("run "+this.id+" process.") }
+        },
+        { type : "img" , id : "ha-1", src:"./res/ha-1.png"},
 
-		},
-		{ type : "img" , id : "ha-1", src:"./res/ha-1.png"},
+        {
+            //run this process delay 6ms, default:queue.defaultDelay 
+            delay : 6 ,  
+            type : "fn",
 
-		{
-			//run this process delay 6ms, default:queue.defaultDelay 
-			delay : 6 ,  
-			start:function(){ console.log("run "+this.id+" process.") }
-		},
+            fn:function(){ console.log("run "+this.id+" process.") }
+        },
 
-		//whitout ext-filename. the loader will detect which type can play
-		{ type : "audio" , weight : 4 , id : "bgm-1", src:"./res/bgm-1"},
-	],
-	onProgressing : function(deltaTime,queue){
-		console.log( "progressing" , queue.finishedWeight," of ",queue.totalWeight);
-	},
-	onFinish : function(queue){
-		console.log("finished : " , queue.finishedCount );
-	}
+        //whitout ext-filename. the loader will detect which type can play
+        { type : "audio" , weight : 4 , id : "bgm-1", src:"./res/bgm-1"},
+    ],
+    onProgressing : function(deltaTime,queue){
+        console.log( "progressing" , queue.finishedWeight," of ",queue.totalWeight);
+    },
+    onFinish : function(queue){
+        console.log("finished : " , queue.finishedCount );
+    }
 });
 queue.init();
 queue.start();
