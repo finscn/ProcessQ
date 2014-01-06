@@ -1,8 +1,8 @@
 ;
-(function(scope, undefined) {
+(function(exports, undefined) {
     'use strict';
 
-    var ProcessQ = scope.ProcessQ = function(cfg) {
+    var ProcessQ = exports.ProcessQ = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -20,11 +20,11 @@
 
         interval: 20,
 
-        ignorError: true,
+        ignoreError: true,
         delay: 0,
         defalutType: "img",
 
-        paiallel: false,
+        parallel: false,
         wrapAudio: false,
         rootPath: null,
         defaultItemIsFinished: function() {
@@ -74,12 +74,10 @@
             }
             item.options = options;
 
-            if (!item.src && item.url) {
-                item.src = item.url;
-            }
-            if (!item.id) {
-                item.id = item.src || "id_" + (this.items.length + 1);
-            }
+            item.src = item.src || item.url;
+
+            item.id = item.id || item.src || "id_" + (this.items.length + 1);
+
             var type = item.type || this.defalutType;
             if (type) {
                 item = new ProcessQ.types[type](item);
@@ -114,14 +112,14 @@
             this.timerStart();
             this.activeItem(0);
 
-            if (this.paiallel) {
-                this.runPaiallel();
+            if (this.parallel) {
+                this.runParallel();
             } else {
                 this.run();
             }
         },
 
-        runPaiallel: function() {
+        runParallel: function() {
             var Me = this;
             this.items.forEach(function(item) {
                 item.start(Me);
@@ -140,7 +138,14 @@
                         if (!finished[idx] && item.isFinished(Me)) {
                             finished[idx] = true;
                             Me._onItemFinish(item, Me);
-                        };
+                        } else if (item.isError && item.isError(Me)) {
+                            Me.onItemError(item, Me);
+                            if (Me.ignoreError) {
+                                finished[idx] = true;
+                                Me.finishedCount += 1;
+                                Me.finishedWeight += item.weight;
+                            }
+                        }
                     });
                     var currentFinished = Me.finishedWeight;
                     if (currentFinished !== lastFinished) {
@@ -208,7 +213,9 @@
                 this.currentItem._started = true;
             }
 
+
             if (this.currentItem._started) {
+
                 if (this.currentItem.isFinished(this)) {
                     this._onItemFinish(this.currentItem, this);
 
@@ -219,7 +226,8 @@
 
                     this.onItemError(this.currentItem, this);
 
-                    if (this.ignorError) {
+                    if (this.ignoreError) {
+                        this.finishedCount += 1;
                         this.finishedWeight += this.currentItem.weight;
                         this.next(timeStep);
                     }
@@ -266,7 +274,7 @@
 
     };
 
-    var FunctionLoader = scope.FunctionLoader = function(cfg) {
+    var FunctionLoader = exports.FunctionLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -302,7 +310,7 @@
 
     }
 
-    var ImageLoader = scope.ImageLoader = function(cfg) {
+    var ImageLoader = exports.ImageLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -312,32 +320,51 @@
     ImageLoader.prototype = {
         constructor: ImageLoader,
         id: null,
+        src: null,
+        finished: false,
         async: false,
+        lazy: false,
         errorEvent: null,
 
         start: function(queue) {
+            if (this.lazy) {
+                this.finished = true;
+                return;
+            }
             var img = this.img = new Image();
             this.finished = this.async;
             img.loader = this;
             img.addEventListener("load", this._onload);
             img.addEventListener("error", this._onerror);
             img.src = this.src;
+            this.loading = true;
         },
 
         _onload: function(event) {
             this.loader.finished = true;
+            this.loader.loading = false;
             this.removeEventListener("load", this.loader._onload);
+            this.loader.onLoad(this, event);
             delete this.loader;
         },
+        onLoad: function(img, event) {
 
+        },
         _onerror: function(event) {
             this.loader.finished = false;
             this.loader.errorEvent = event;
             this.removeEventListener("error", this.loader._onerror);
+            this.loader.onError(this, event);
             delete this.loader;
+        },
+        onError: function(img, event) {
+
         },
 
         getResult: function() {
+            if (this.lazy) {
+                return this;
+            }
             return this.img;
         },
 
@@ -356,7 +383,7 @@
     }
 
 
-    var AudioLoader = scope.AudioLoader = function(cfg) {
+    var AudioLoader = exports.AudioLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -383,17 +410,35 @@
     AudioLoader.prototype = {
         constructor: AudioLoader,
         id: null,
+        src: null,
+        finished: false,
         async: false,
+        lazy: false,
         errorEvent: null,
         wrap: null,
+        ignoreIOS: true,
+        isIOS: function() {
+            if (typeof window != "undefined" && window.navigator && window.navigator.userAgent && window.navigator.userAgent.toLowerCase) {
+                var ua = window.navigator.userAgent.toLowerCase();
+                var iPhone = /iphone/.test(ua);
+                var iPad = /ipad/.test(ua);
+                var iPod = /ipod/.test(ua);
+                var iOS = iPhone || iPad || iPod;
+                var l = window.location;
+                var inBroswer = l && l.replace && l.reload;
+                return iOS && inBroswer;
+            }
+            return false;
+        },
         start: function(queue) {
-            this.wrap = this.wrap===null?queue.wrapAudio:this.wrap;
-            var audio = this.audio = new Audio();
+            if (this.lazy) {
+                this.finished = true;
+                return;
+            }
+            this.wrap = this.wrap === null ? queue.wrapAudio : this.wrap;
             this.finished = this.async;
-            audio.loader = this;
-            audio.addEventListener("canplaythrough", this._onload);
-            audio.addEventListener("error", this._onerror);
 
+            var audio = this.audio = new Audio();
             //TODO : check has ext-filename
             if (this.src.indexOf(AudioLoader.supportFormat) == -1) {
                 audio.src = this.src + "." + AudioLoader.supportFormat;
@@ -403,21 +448,46 @@
             audio.loop = this.loop || false;
             audio.preload = true;
             audio.autobuffer = true;
+
+            if (this.ignoreIOS && this.isIOS()) {
+                this.finished = true;
+                this.wrap = false;
+                this.audio = null;
+                return;
+            }
+            audio.loader = this;
+            audio.addEventListener("canplaythrough", this._onload);
+            audio.addEventListener("error", this._onerror);
             audio.load();
+            this.loading = true;
         },
+
         _onload: function(event) {
             this.loader.finished = true;
+            this.loader.loading = false;
             this.removeEventListener("canplaythrough", this.loader._onload);
+            this.loader.onLoad(this, event);
             delete this.loader;
+        },
+        onLoad: function(audio, event) {
+
         },
 
         _onerror: function(event) {
             this.loader.finished = false;
             this.loader.errorEvent = event;
             this.removeEventListener("error", this.loader._onerror);
+            this.loader.onError(this, event);
             delete this.loader;
         },
+        onError: function(audio, event) {
+
+        },
+
         getResult: function() {
+            if (this.lazy) {
+                return this;
+            }
             if (typeof Sound != "undefined" && this.wrap && !(this.audio instanceof Sound)) {
                 var o = this.options || {};
                 o.audio = this.audio;
