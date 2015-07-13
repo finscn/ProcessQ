@@ -1,8 +1,10 @@
-;
-(function(exports, undefined) {
-    'use strict';
+'use strict';
 
-    var ProcessQ = exports.ProcessQ = function(cfg) {
+var GT = GT || {};
+
+(function(exports) {
+
+    var ProcessQ = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -192,7 +194,7 @@
                             if (Me.blockItem === item) {
                                 Me.blockItem = null;
                             }
-                        }else if (item.update){
+                        } else if (item.update) {
                             item.update();
                         }
                     }
@@ -336,7 +338,7 @@
 
     };
 
-    var FunctionLoader = exports.FunctionLoader = function(cfg) {
+    var FunctionLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -378,7 +380,7 @@
 
     };
 
-    var ImageLoader = exports.ImageLoader = function(cfg) {
+    var ImageLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -456,7 +458,7 @@
     }
 
 
-    var AudioLoader = exports.AudioLoader = function(cfg) {
+    var AudioLoader = function(cfg) {
         for (var key in cfg) {
             this[key] = cfg[key]
         }
@@ -593,5 +595,9 @@
 
     };
 
+    exports.ProcessQ = ProcessQ;
+    // exports.FunctionLoader = FunctionLoader;
+    // exports.ImageLoader = ImageLoader;
+    // exports.AudioLoader = AudioLoader;
 
-}(this));
+}(GT));
