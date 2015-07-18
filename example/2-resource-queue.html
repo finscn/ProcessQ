@@ -16,7 +16,7 @@
 
 <script>
 
-var queue=new ProcessQ({
+var queue=new GT.ProcessQ({
 
     defaultDelay : 20 , // run every process delay "defaultDelay" ms
     items : [
@@ -45,9 +45,9 @@ window.onload=function(){
     processingBar=document.getElementById("bar");
     queue.init();
     queue.start();
-    
+
 }
-    
+
 </script>
 <style type="text/css">
 #bar-box {
