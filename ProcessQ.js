@@ -139,12 +139,6 @@ var GT = GT || {};
 
             Me.blockItem = null;
 
-            // for (var i = 0; i < parallelCount; i++) {
-            //     Me.items[paralleled].start(Me);
-            //     paralleled++;
-            //     paralleledIdle++;
-            // }
-
             function check() {
                 var totalCount = Me.items.length;
                 if (Me.finishedCount >= totalCount) {
@@ -167,10 +161,6 @@ var GT = GT || {};
                         }
                     }
 
-                    // if (Me.finishedCount == paralleled) {
-                    //     Me.items[paralleled].start(Me);
-                    //     paralleled++;
-                    // }
                     for (var idx = 0; idx < paralleled; idx++) {
                         if (idx >= totalCount) {
                             break;
@@ -195,7 +185,7 @@ var GT = GT || {};
                                 Me.blockItem = null;
                             }
                         } else if (item.update) {
-                            item.update();
+                            item.update(delay, Me);
                         }
                     }
 
@@ -281,15 +271,10 @@ var GT = GT || {};
                         this.next(timeStep);
                     }
                 } else if (this.currentItem.update) {
-                    this.currentItem.update();
+                    this.currentItem.update(timeStep, this);
                 }
             }
 
-            if (this.currentItem) {
-                if (this.currentItem.onProgressing) {
-                    this.currentItem.onProgressing(timeStep, this);
-                }
-            }
             this.onProgressing(timeStep, this);
         },
 
@@ -335,8 +320,13 @@ var GT = GT || {};
             return list;
         }
 
-
     };
+
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+
 
     var FunctionLoader = function(cfg) {
         for (var key in cfg) {
@@ -379,6 +369,13 @@ var GT = GT || {};
         }
 
     };
+
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+
+
 
     var ImageLoader = function(cfg) {
         for (var key in cfg) {
@@ -455,7 +452,12 @@ var GT = GT || {};
             return this.errorEvent;
         }
 
-    }
+    };
+
+
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 
 
     var AudioLoader = function(cfg) {
