@@ -29,6 +29,7 @@ var GT = GT || {};
         parallel: false,
         wrapAudio: false,
         rootPath: null,
+
         defaultItemIsFinished: function() {
             return true;
         },
@@ -109,27 +110,25 @@ var GT = GT || {};
         start: function() {
             this.paused = false;
             this.itemIndex = 0;
-            this.finishedWeight = 0;
+            this.finished = {};
             this.finishedCount = 0;
+            this.finishedWeight = 0;
             var Me = this;
             setTimeout(function() {
                 Me.timerStart();
                 Me.activeItem(0);
-                if (Me.parallel) {
-                    Me.runParallel();
-                } else {
-                    Me.run();
-                }
+                Me.run();
             }, 20);
         },
 
-        runParallel: function() {
-            var totalCount = this.items.length;
+        run: function() {
+            var totalCount = this.totalCount = this.items.length;
             var delay = this.delay || 10;
 
             var Me = this;
 
-            var parallelCount = typeof this.parallel == "number" ? this.parallel : (totalCount >> 2);
+            var parallelCount = !this.parallel ? 1 : (typeof this.parallel == "number" ? this.parallel : (totalCount >> 2));
+
             parallelCount = Math.min(totalCount, parallelCount);
             var paralleled = 0;
             var paralleledIdle = parallelCount;
@@ -144,7 +143,12 @@ var GT = GT || {};
                 if (Me.finishedCount >= totalCount) {
                     Me.finish();
                 } else {
-
+                    if (Me.paused) {
+                        if (Me.onPausing) {
+                            Me.onPausing(timeStep);
+                        }
+                        return;
+                    }
                     if (!Me.blockItem) {
                         for (var i = 0; i < paralleledIdle; i++) {
                             if (paralleled >= totalCount) {
@@ -200,21 +204,6 @@ var GT = GT || {};
             check();
         },
 
-        run: function() {
-            this.mainLoop = setTimeout(this.callRun, this.interval);
-            this.timerTick();
-            var timeStep = this.timer.delta;
-            if (this.paused && this.onPausing != null) {
-                this.onPausing(timeStep);
-                return;
-            }
-            if (!this.currentItem) {
-                this.finish();
-                return;
-            }
-            this.update(timeStep);
-        },
-
         finish: function() {
             clearTimeout(this.mainLoop);
             if (this.onFinish != null) {
@@ -222,11 +211,6 @@ var GT = GT || {};
             }
         },
         onFinish: null,
-
-        next: function(timeStep) {
-            this.activeItem(++this.itemIndex);
-            this.onNext(timeStep, this);
-        },
 
         getItem: function(index) {
             return this.items[index];
@@ -244,39 +228,6 @@ var GT = GT || {};
             }
         },
 
-        update: function(timeStep) {
-            if (timeStep < 1) {
-                return;
-            }
-            if (this.currentItem._delay >= this.interval) {
-                this.currentItem._delay -= timeStep;
-            } else if (!this.currentItem._started) {
-                this.currentItem.start(this);
-                this.currentItem._started = true;
-            }
-
-            if (this.currentItem._started) {
-
-                if (this.currentItem.isFinished(this)) {
-                    this._onItemFinish(this.currentItem, this);
-                    this.next(timeStep);
-
-                } else if (this.currentItem.isError && this.currentItem.isError(this)) {
-
-                    this.onItemError(this.currentItem, this);
-
-                    if (this.ignoreError) {
-                        this.finishedCount += 1;
-                        this.finishedWeight += this.currentItem.weight;
-                        this.next(timeStep);
-                    }
-                } else if (this.currentItem.update) {
-                    this.currentItem.update(timeStep, this);
-                }
-            }
-
-            this.onProgressing(timeStep, this);
-        },
 
         onItemFinish: function(item, queue) {
 
@@ -290,9 +241,10 @@ var GT = GT || {};
                 var rs = item.getResult();
                 this.resultPool[item.id] = rs;
             }
+            this.finished[item.id] = true;
             this.finishedCount += 1;
             this.finishedWeight += item.weight;
-            this.onItemFinish(item, queue)
+            this.onItemFinish(item, queue);
         },
 
         onItemError: function(item, queue) {
@@ -305,9 +257,7 @@ var GT = GT || {};
         onProgressing: function(timeStep, queue) {
 
         },
-        onNext: function(timeStep, queue) {
 
-        },
 
         getUnfinishedItems: function() {
             var list = [];
@@ -323,9 +273,9 @@ var GT = GT || {};
     };
 
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
 
 
     var FunctionLoader = function(cfg) {
@@ -371,9 +321,9 @@ var GT = GT || {};
     };
 
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
 
 
 
@@ -455,9 +405,9 @@ var GT = GT || {};
     };
 
 
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
 
 
     var AudioLoader = function(cfg) {
