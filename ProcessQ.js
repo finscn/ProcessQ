@@ -104,13 +104,14 @@ var GT = GT || {};
             item.isFinished = item.isFinished || this.defaultItemIsFinished;
             this.totalWeight += item.weight;
             this.items.push(item);
-            this.itemCount++;
+            this.itemCount = this.items.length;
         },
 
         start: function() {
             this.paused = false;
             this.itemIndex = 0;
-            this.finished = {};
+            this.itemCount = this.items.length;
+            this.finishedItems = {};
             this.finishedCount = 0;
             this.finishedWeight = 0;
             var Me = this;
@@ -122,10 +123,10 @@ var GT = GT || {};
         },
 
         run: function() {
-            var totalCount = this.totalCount = this.items.length;
-            var delay = this.delay || 10;
-
             var Me = this;
+
+            var totalCount = this.itemCount;
+            var timeStep = this.delay || 10;
 
             var parallelCount = !this.parallel ? 1 : (typeof this.parallel == "number" ? this.parallel : (totalCount >> 2));
 
@@ -133,7 +134,7 @@ var GT = GT || {};
             var paralleled = 0;
             var paralleledIdle = parallelCount;
 
-            var finishedItems = {};
+            var finishedItems = this.finishedItems;
             var lastFinished = null;
 
             Me.blockItem = null;
@@ -144,9 +145,7 @@ var GT = GT || {};
                     Me.finish();
                 } else {
                     if (Me.paused) {
-                        if (Me.onPausing) {
-                            Me.onPausing(timeStep);
-                        }
+                        Me.onPausing(timeStep);
                         return;
                     }
                     if (!Me.blockItem) {
@@ -175,8 +174,9 @@ var GT = GT || {};
                             finished = true;
                             Me._onItemFinish(item, Me);
                         } else if (item.isError && item.isError(Me)) {
-                            Me.onItemError(item, Me);
+                            Me._onItemError(item, Me);
                             if (Me.ignoreError) {
+                                finishedItems[idx] = -1;
                                 finished = true;
                                 Me.finishedCount += 1;
                                 Me.finishedWeight += item.weight;
@@ -184,21 +184,21 @@ var GT = GT || {};
                         }
                         if (finished) {
                             paralleledIdle++;
-                            finishedItems[idx] = true;
+                            finishedItems[idx] = 1;
                             if (Me.blockItem === item) {
                                 Me.blockItem = null;
                             }
                         } else if (item.update) {
-                            item.update(delay, Me);
+                            item.update(timeStep, Me);
                         }
                     }
 
                     var currentFinished = Me.finishedWeight;
                     if (currentFinished !== lastFinished) {
-                        Me.onProgressing(delay, Me);
+                        Me.onProgressing(timeStep, Me);
                         lastFinished = currentFinished;
                     }
-                    setTimeout(check, delay);
+                    setTimeout(check, timeStep);
                 }
             }
             check();
@@ -228,30 +228,35 @@ var GT = GT || {};
             }
         },
 
-
-        onItemFinish: function(item, queue) {
-
-        },
-
         _onItemFinish: function(item, queue) {
             if (item.onFinish) {
                 item.onFinish(queue);
             }
+            var result;
             if (item.getResult) {
-                var rs = item.getResult();
-                this.resultPool[item.id] = rs;
+                result = item.getResult();
+                this.resultPool[item.id] = result;
             }
-            this.finished[item.id] = true;
             this.finishedCount += 1;
             this.finishedWeight += item.weight;
-            this.onItemFinish(item, queue);
+            this.onItemFinish(item, result, queue);
         },
 
-        onItemError: function(item, queue) {
+        onItemFinish: function(item, result, queue) {
+
+        },
+
+        _onItemError: function(item, queue) {
+            var errorEvent = item.errorEvent;
             if (item.onError) {
-                item.onError(item.errorEvent, queue);
+                item.onError(errorEvent, queue);
             }
             item.errorEvent = null;
+            this.onItemError(item, errorEvent, queue)
+        },
+
+        onItemError: function(item, errorEvent, queue) {
+
         },
 
         onProgressing: function(timeStep, queue) {
@@ -292,22 +297,25 @@ var GT = GT || {};
         block: false,
         errorEvent: null,
 
-        fn: function() {
+        fn: function(queue) {
 
         },
-        update: null,
+
         start: function(queue) {
             this.finished = this.async;
             // this.finished = true;
-            this.result = this.fn(this, queue);
+            this.result = this.fn(queue);
+        },
+
+        // function(timeStep, queue)
+        update: null,
+
+        onFinish: function(queue) {
+
         },
 
         getResult: function() {
             return this.result;
-        },
-
-        onFinish: function(queue) {
-
         },
 
         isFinished: function(queue) {
@@ -352,15 +360,15 @@ var GT = GT || {};
             var img = this.img = new Image();
             this.finished = this.async;
             img.loader = this;
-            img.addEventListener("load", this._onload);
-            img.addEventListener("error", this._onerror);
+            img.addEventListener("load", this._onLoad);
+            img.addEventListener("error", this._onError);
             img.src = this.src;
             this.loading = true;
         },
 
-        _onload: function(event) {
+        _onLoad: function(event) {
             var img = this;
-            img.removeEventListener("load", img.loader._onload);
+            img.removeEventListener("load", img.loader._onLoad);
             img.loaded = true;
             img.loader.finished = true;
             img.loader.loading = false;
@@ -370,9 +378,9 @@ var GT = GT || {};
         onLoad: function(img, event) {
 
         },
-        _onerror: function(event) {
+        _onError: function(event) {
             var img = this;
-            img.removeEventListener("error", img.loader._onerror);
+            img.removeEventListener("error", img.loader._onError);
             img.loaded = false;
             img.loader.finished = false;
             img.loader.errorEvent = event;
@@ -490,19 +498,19 @@ var GT = GT || {};
             if (this.volume) {
                 audio.volume = this.volume;
             }
-            audio.preload = true;
+            audio.preload = "auto";
             audio.autobuffer = true;
             audio.autoplay = false;
 
             audio.loader = this;
-            audio.addEventListener("canplaythrough", this._onload);
-            audio.addEventListener("error", this._onerror);
+            audio.addEventListener("canplaythrough", this._onLoad);
+            audio.addEventListener("error", this._onError);
             audio.load();
             return audio;
         },
 
-        _onload: function(event) {
-            this.removeEventListener("canplaythrough", this.loader._onload);
+        _onLoad: function(event) {
+            this.removeEventListener("canplaythrough", this.loader._onLoad);
             this.loaded = true;
             this.loader.finished = true;
             this.loader.loading = false;
@@ -513,8 +521,8 @@ var GT = GT || {};
 
         },
 
-        _onerror: function(event) {
-            this.removeEventListener("error", this.loader._onerror);
+        _onError: function(event) {
+            this.removeEventListener("error", this.loader._onError);
             this.loaded = false;
             this.loader.finished = false;
             this.loader.errorEvent = event;
@@ -529,11 +537,6 @@ var GT = GT || {};
             if (this.lazy) {
                 return this;
             }
-            // if (typeof Sound != "undefined" && this.wrap && !(this.audio instanceof Sound)) {
-            //     var o = this.options || {};
-            //     o.audio = this.audio;
-            //     this.audio = new Sound(o);
-            // }
             return this.audio;
         },
 
@@ -546,6 +549,11 @@ var GT = GT || {};
         },
 
     };
+
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////
+
 
     exports.ProcessQ = ProcessQ;
     // exports.FunctionLoader = FunctionLoader;
