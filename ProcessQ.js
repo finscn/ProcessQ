@@ -130,7 +130,7 @@ var GT = GT || {};
 
             var parallelCount = !this.parallel ? 1 : (typeof this.parallel == "number" ? this.parallel : (totalCount >> 2));
 
-            parallelCount = Math.min(totalCount, parallelCount);
+            parallelCount = Math.min(totalCount, parallelCount || 1);
             var paralleled = 0;
             var paralleledIdle = parallelCount;
 
